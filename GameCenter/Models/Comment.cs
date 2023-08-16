@@ -15,6 +15,6 @@ public class Comment
     public int UId { get; set; }
     public Comment? Reply { get; set; }
     public int? ParentId { get; set; }
-
+    public ICollection<Comment> Replies { get; set; }
 
 }
