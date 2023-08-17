@@ -1,18 +1,37 @@
 ﻿using GameCenter.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GameCenter.Data
+namespace GameCenter.Data;
+
+public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+    }
 
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<Platform> Platforms { get; set; }
-        public DbSet<Rate> Rates { get; set; }
-        public DbSet<GameToPlatform> GameToPlatform { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<Platform> Platforms { get; set; }
+    public DbSet<Rate> Rates { get; set; }
+    public DbSet<GameToPlatform> GameToPlatform { get; set; }
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<PostToPlatform> PostToPlatforms { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
+    }
+}
+
+internal class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<GameCenterUser>
+{
+    public void Configure(EntityTypeBuilder<GameCenterUser> builder)
+    {
+        builder.Property(u => u.FirstName).HasMaxLength(128);
+        builder.Property(u => u.LastName).HasMaxLength(128);
     }
 }
