@@ -5,11 +5,11 @@ namespace GameCenter.Models;
 [Table("Rates")]
 public class Rate
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int GameRate { get; set; }
     public Game Game { get; set; }
-    public int GId { get; set; }
+    public Guid GId { get; set; }
     public IdentityUser User { get; set; }
-    public int UId { get; set; }
+    public Guid UId { get; set; }
 
 }
