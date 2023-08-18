@@ -1,165 +1,63 @@
-﻿using GameCenter.Data;
-using GameCenter.Models.User;
-using Microsoft.AspNetCore.Identity;
+﻿using GameCenter.Models.User;
+using GameCenter.Services.AuthService;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
-namespace GameCenter.Controllers
+namespace GameCenter.Controllers;
+
+[Route("[controller]")]
+[ApiController]
+public class AuthenticateController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthenticateController : ControllerBase
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthenticateController> _logger;
+
+    public AuthenticateController(IAuthService authService, ILogger<AuthenticateController> logger)
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _configuration;
+        _authService = authService;
+        _logger = logger;
+    }
 
-        public AuthenticateController(
-            UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration
-            )
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginModel model)
+    {
+        try
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _configuration = configuration;
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid payload");
+            var (status, message) = await _authService.Login(model);
+
+            if (status == 0)
+                return BadRequest(message);
+
+            return Ok(message);
         }
-
-        [HttpPost]
-        [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        catch (Exception ex)
         {
-            var user = await _userManager.FindByNameAsync(model.Email);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var userRoles = await _userManager.GetRolesAsync(user);
-
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
-
-                var token = GetToken(authClaims);
-
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
-                });
-
-            }
-            return Unauthorized();
+            _logger.LogError(ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
+    }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterModel registerModel)
+    {
+        try
         {
-            var userExists = await _userManager.FindByEmailAsync(model.Email);
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid Payload!");
 
-            if (userExists != null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response
-                {
-                    Status = "Error",
-                    Message = "User with given Email already exists"
-                });
-            }
+            var (status, message) = await _authService.Register(registerModel, UserRoles.Admin);
 
-            IdentityUser user = new GameCenterUser()
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                UserName = model.Username,
-                SecurityStamp = Guid.NewGuid().ToString(),
-            };
+            if (status == 0)
+                return BadRequest(message);
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creating failed" });
-            }
-
-            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+            return CreatedAtAction(nameof(Register), registerModel);
         }
-
-        [HttpPost]
-        [Route("register-admin")]
-        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
+        catch (Exception ex)
         {
-            var userExists = await _userManager.FindByEmailAsync(model.Email);
 
-            if (userExists != null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response
-                {
-                    Status = "Error",
-                    Message = "User with given Email already exists"
-                });
-            }
-
-            IdentityUser user = new GameCenterUser()
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                UserName = model.Username,
-                SecurityStamp = Guid.NewGuid().ToString(),
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creating failed" });
-            }
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Moderator))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Moderator));
-            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
-            {
-                await _userManager.AddToRoleAsync(user, UserRoles.Admin);
-            }
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Moderator))
-            {
-                await _userManager.AddToRoleAsync(user, UserRoles.Moderator);
-            }
-            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-            {
-                await _userManager.AddToRoleAsync(user, UserRoles.User);
-            }
-
-            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
-
-        }
-
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            return token;
+            _logger.LogError(ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 }
