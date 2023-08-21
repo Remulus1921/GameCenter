@@ -8,8 +8,8 @@ public class Rate
     public Guid Id { get; set; }
     public int GameRate { get; set; }
     public Game Game { get; set; }
-    public Guid GId { get; set; }
+    public Guid GameId { get; set; }
     public IdentityUser User { get; set; }
-    public Guid UId { get; set; }
+    public string UserId { get; set; }
 
 }

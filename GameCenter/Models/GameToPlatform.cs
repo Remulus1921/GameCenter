@@ -3,7 +3,7 @@ public class GameToPlatform
 {
     public Guid Id { get; set; }
     public Game Game { get; set; }
-    public Guid GId { get; set; }
+    public Guid GameId { get; set; }
     public Platform Platform { get; set; }
-    public Guid PId { get; set; }
+    public Guid PlatformId { get; set; }
 }

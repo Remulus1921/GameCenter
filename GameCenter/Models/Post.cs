@@ -12,5 +12,5 @@ public class Post
     public DateTime Created { get; set; }
     public string? ImagePath { get; set; }
     public IdentityUser User { get; set; }
-    public Guid Uid { get; set; }
+    public string UserId { get; set; }
 }

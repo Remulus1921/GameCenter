@@ -10,10 +10,10 @@ public class Comment
     public DateTime CreationDate { get; set; }
     public DateTime ModificationDate { get; set; }
     public Game Game { get; set; }
-    public Guid GId { get; set; }
+    public Guid GameId { get; set; }
     public IdentityUser User { get; set; }
-    public Guid UId { get; set; }
-    public Comment? Reply { get; set; }
+    public string UserId { get; set; }
+    public Comment? Parent { get; set; }
     public Guid? ParentId { get; set; }
     public ICollection<Comment> Replies { get; set; }
 
