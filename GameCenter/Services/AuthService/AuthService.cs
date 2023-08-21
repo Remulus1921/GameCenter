@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace GameCenter.Services.AuthService;
@@ -13,16 +14,19 @@ public class AuthService : IAuthService
     private readonly UserManager<GameCenterUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _context;
 
     public AuthService(
         UserManager<GameCenterUser> userManager,
         RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        IConfiguration configuration,
+        ApplicationDbContext context
         )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _context = context;
     }
 
     public async Task<(int, string)> Register(RegisterModel model, string role)
@@ -62,18 +66,75 @@ public class AuthService : IAuthService
 
     }
 
-    public async Task<(int, string)> Login(LoginModel model)
+    public async Task<(int, string, RefreshToken?)> Login(LoginModel model)
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
-            return (0, "Invalid Email");
+            return (0, "Invalid Email", null);
         if (!await _userManager.CheckPasswordAsync(user, model.Password))
-            return (0, "Invalid Password");
+            return (0, "Invalid Password", null);
 
+        string token = await GenerateToken(user);
+
+        var refreshToken = GenerateRefreshToken();
+        refreshToken.UserId = user.Id;
+
+        _context.Add(refreshToken);
+        _context.SaveChanges();
+
+        return (1, token, refreshToken);
+    }
+
+    public async Task<(int, string, RefreshToken?)> RefreshToken(string userName, string token)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null) return (0, "Invalid Username", null);
+
+        var refreshToken = _context.RefreshTokens.FirstOrDefault(r => r.Token == token && r.UserId == user.Id);
+        if (refreshToken == null) return (0, "There is no such token", null);
+        else if (refreshToken.IsValid == false)
+        {
+            var childToken = _context.RefreshTokens.FirstOrDefault(r => r.ParentId == refreshToken.Id);
+            while (childToken != null)
+            {
+                childToken.IsValid = false;
+                childToken = _context.RefreshTokens.FirstOrDefault(r => r.ParentId == childToken.Id);
+            }
+            return (0, "Refresh token got compromised relog", null);
+        }
+
+        if (refreshToken.Expires < DateTime.Now) return (0, "Token expired", null);
+
+        string newToken = await GenerateToken(user);
+        var newRefreshToken = GenerateRefreshToken();
+
+        refreshToken.IsValid = false;
+
+        newRefreshToken.UserId = user.Id;
+        newRefreshToken.ParentId = refreshToken.Id;
+        _context.Add(newRefreshToken);
+        _context.SaveChanges();
+
+        return (1, newToken, newRefreshToken);
+    }
+
+    private RefreshToken GenerateRefreshToken()
+    {
+        var refreshToken = new RefreshToken
+        {
+            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            Expires = DateTime.Now.AddDays(7)
+        };
+
+        return refreshToken;
+    }
+
+    private async Task<string> GenerateToken(GameCenterUser user)
+    {
         var userRoles = await _userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
@@ -82,19 +143,12 @@ public class AuthService : IAuthService
             authClaims.Add(new Claim(ClaimTypes.Role, userRole));
         }
 
-        string token = GenerateToken(authClaims);
-
-        return (1, token);
-    }
-
-    private string GenerateToken(IEnumerable<Claim> authClaims)
-    {
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt:Secret").Value!));
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = _configuration.GetSection("Jwt:Issuer").Value,
             Audience = _configuration.GetSection("Jwt:Audience").Value,
-            Expires = DateTime.Now.AddDays(1),
+            Expires = DateTime.Now.AddHours(1),
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
             Subject = new ClaimsIdentity(authClaims)
         };
@@ -104,4 +158,6 @@ public class AuthService : IAuthService
 
         return tokenHandler.WriteToken(token);
     }
+
+
 }
