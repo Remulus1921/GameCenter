@@ -1,4 +1,5 @@
 ﻿using GameCenter.Models;
+using GameCenter.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<GameToPlatform> GameToPlatform { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<PostToPlatform> PostToPlatforms { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
