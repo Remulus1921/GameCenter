@@ -24,10 +24,19 @@ public class AuthenticateController : ControllerBase
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid payload");
-            var (status, message) = await _authService.Login(model);
+
+            var (status, message, refreshToken) = await _authService.Login(model);
 
             if (status == 0)
                 return BadRequest(message);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = refreshToken!.Expires,
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
 
             return Ok(message);
         }
@@ -59,5 +68,28 @@ public class AuthenticateController : ControllerBase
             _logger.LogError(ex.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] string userName)
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken == null)
+            return BadRequest("There is no refresh token in cookies log in again");
+
+        var (status, message, newRefreshToken) = await _authService.RefreshToken(userName, refreshToken);
+
+        if (status == 0)
+            return BadRequest(message);
+
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = newRefreshToken!.Expires,
+        };
+
+        Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+
+        return Ok(message);
     }
 }
