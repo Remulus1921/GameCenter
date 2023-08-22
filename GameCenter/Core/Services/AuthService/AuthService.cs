@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GameCenter.Services.AuthService;
+namespace GameCenter.Core.Services.AuthService;
 
 public class AuthService : IAuthService
 {
@@ -112,6 +112,7 @@ public class AuthService : IAuthService
 
         newRefreshToken.UserId = user.Id;
         newRefreshToken.ParentId = refreshToken.Id;
+
         _context.Add(newRefreshToken);
         _context.SaveChanges();
 

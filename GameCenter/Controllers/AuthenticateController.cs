@@ -1,5 +1,5 @@
-﻿using GameCenter.Models.User;
-using GameCenter.Services.AuthService;
+﻿using GameCenter.Core.Services.AuthService;
+using GameCenter.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameCenter.Controllers;

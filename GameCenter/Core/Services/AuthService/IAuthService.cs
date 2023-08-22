@@ -1,6 +1,6 @@
 ﻿using GameCenter.Models.User;
 
-namespace GameCenter.Services.AuthService;
+namespace GameCenter.Core.Services.AuthService;
 
 public interface IAuthService
 {

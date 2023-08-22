@@ -1,5 +1,5 @@
+using GameCenter.Core.Services.AuthService;
 using GameCenter.Data;
-using GameCenter.Services.AuthService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
