@@ -1,10 +1,11 @@
-﻿using GameCenter.Core.Repositories.PlatformRepository;
+﻿using GameCenter.Core.Repositories.GameRepository;
+using GameCenter.Core.Repositories.PlatformRepository;
 
-namespace GameCenter.Data.UnitOfWork
+namespace GameCenter.Data.UnitOfWork;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        IPlatformRepository Platforms { get; }
-        Task CompleteAsync();
-    }
+    IPlatformsRepository Platforms { get; }
+    IGamesRepository Games { get; }
+    Task CompleteAsync();
 }
