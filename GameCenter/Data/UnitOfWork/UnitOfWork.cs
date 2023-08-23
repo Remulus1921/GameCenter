@@ -1,5 +1,6 @@
 ﻿using GameCenter.Core.Repositories.GameRepository;
 using GameCenter.Core.Repositories.PlatformRepository;
+using GameCenter.Core.Repositories.RatesRepository;
 
 namespace GameCenter.Data.UnitOfWork;
 
@@ -8,12 +9,14 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
     public IPlatformsRepository Platforms { get; private set; }
     public IGamesRepository Games { get; private set; }
+    public IRatesRepository Rates { get; set; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
         Platforms = new PlatformsRepository(_context);
         Games = new GamesRepository(_context);
+        Rates = new RatesRepository(_context);
     }
 
     public async Task CompleteAsync()

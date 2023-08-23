@@ -26,6 +26,37 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
+
+        builder.Entity<Rate>()
+            .HasOne(r => r.Game)
+            .WithMany(g => g.GameRates)
+            .HasForeignKey(r => r.GameId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Comment>()
+            .HasOne(c => c.Parent)
+            .WithMany(c => c.Replies)
+            .HasForeignKey(c => c.ParentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Comment>()
+            .HasOne(c => c.Game)
+            .WithMany(g => g.GameComments)
+            .HasForeignKey(c => c.GameId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Game>()
+            .HasMany(g => g.GameRates)
+            .WithOne(r => r.Game)
+            .HasForeignKey(r => r.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Game>()
+            .HasMany(g => g.GameComments)
+            .WithOne(r => r.Game)
+            .HasForeignKey(c => c.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 }
 
