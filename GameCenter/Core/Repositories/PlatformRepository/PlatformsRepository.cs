@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GameCenter.Core.Repositories.PlatformRepository;
 
-public class PlatformRepository : GenericRepository<Platform>, IPlatformRepository
+public class PlatformsRepository : GenericRepository<Platform>, IPlatformsRepository
 {
-    public PlatformRepository(ApplicationDbContext context) : base(context)
+    public PlatformsRepository(ApplicationDbContext context) : base(context)
     {
     }
 
