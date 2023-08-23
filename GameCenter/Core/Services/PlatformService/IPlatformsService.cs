@@ -2,7 +2,7 @@
 
 namespace GameCenter.Core.Services.PlatformService;
 
-public interface IPlatformService
+public interface IPlatformsService
 {
     Task<List<PlatformDto>> GetPlatforms();
     Task<bool> AddPlatform(PlatformDto platformDto);

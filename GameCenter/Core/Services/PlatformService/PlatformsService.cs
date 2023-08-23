@@ -4,11 +4,11 @@ using GameCenter.Models;
 
 namespace GameCenter.Core.Services.PlatformService;
 
-public class PlatformService : IPlatformService
+public class PlatformsService : IPlatformsService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public PlatformService(IUnitOfWork unitOfWork)
+    public PlatformsService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
