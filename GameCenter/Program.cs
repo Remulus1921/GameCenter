@@ -1,8 +1,10 @@
 using GameCenter.Core.Repositories.GameRepository;
 using GameCenter.Core.Repositories.PlatformRepository;
+using GameCenter.Core.Repositories.RatesRepository;
 using GameCenter.Core.Services.AuthService;
 using GameCenter.Core.Services.GameService;
 using GameCenter.Core.Services.PlatformService;
+using GameCenter.Core.Services.RatesService;
 using GameCenter.Data;
 using GameCenter.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +24,7 @@ builder.Services.AddControllers();
 // Register repositories
 builder.Services.AddScoped<IGamesRepository, GamesRepository>();
 builder.Services.AddScoped<IPlatformsRepository, PlatformsRepository>();
+builder.Services.AddScoped<IRatesRepository, RatesRepository>();
 
 // Register UnitOfWork
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -30,6 +33,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlatformsService, PlatformsService>();
 builder.Services.AddScoped<IGamesService, GamesService>();
+builder.Services.AddScoped<IRatesService, RatesService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

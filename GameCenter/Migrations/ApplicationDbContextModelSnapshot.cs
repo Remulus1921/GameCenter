@@ -56,7 +56,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.Game", b =>
@@ -94,7 +94,7 @@ namespace GameCenter.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.GameToPlatform", b =>
@@ -115,7 +115,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("PlatformId");
 
-                    b.ToTable("GameToPlatform");
+                    b.ToTable("GameToPlatform", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.Platform", b =>
@@ -130,7 +130,7 @@ namespace GameCenter.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Platforms");
+                    b.ToTable("Platforms", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.Post", b =>
@@ -161,7 +161,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.PostToPlatform", b =>
@@ -182,7 +182,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostToPlatforms");
+                    b.ToTable("PostToPlatforms", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.Rate", b =>
@@ -207,7 +207,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Rates");
+                    b.ToTable("Rates", (string)null);
                 });
 
             modelBuilder.Entity("GameCenter.Models.User.RefreshToken", b =>
@@ -244,7 +244,7 @@ namespace GameCenter.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
