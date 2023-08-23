@@ -6,11 +6,11 @@ namespace GameCenter.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class PlatformController : ControllerBase
+    public class PlatformsController : ControllerBase
     {
-        private readonly IPlatformService _platformService;
+        private readonly IPlatformsService _platformService;
 
-        public PlatformController(IPlatformService platformService)
+        public PlatformsController(IPlatformsService platformService)
         {
             _platformService = platformService;
         }
