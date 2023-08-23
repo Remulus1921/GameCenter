@@ -31,7 +31,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return true;
     }
 
-    public virtual async Task<T?> GetById(int id)
+    public virtual async Task<T?> GetById(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }
