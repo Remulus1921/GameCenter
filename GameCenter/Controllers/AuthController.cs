@@ -6,12 +6,12 @@ namespace GameCenter.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class AuthenticateController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ILogger<AuthenticateController> _logger;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthenticateController(IAuthService authService, ILogger<AuthenticateController> logger)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
         _logger = logger;
