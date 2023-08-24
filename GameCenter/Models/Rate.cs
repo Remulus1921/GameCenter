@@ -7,9 +7,9 @@ public class Rate
 {
     public Guid Id { get; set; }
     public int GameRate { get; set; }
-    public Game Game { get; set; }
     public Guid GameId { get; set; }
-    public IdentityUser User { get; set; }
+    public Game? Game { get; set; }
     public string UserId { get; set; }
+    public IdentityUser? User { get; set; }
 
 }

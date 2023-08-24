@@ -11,9 +11,9 @@ namespace GameCenter.Core.Repositories.RatesRepository
         {
         }
 
-        public async Task<Rate?> GetUserRate(string userId)
+        public async Task<Rate?> GetUserRate(string userId, Guid gameId)
         {
-            return await _context.Rates.Where(r => r.UserId.Equals(userId)).FirstOrDefaultAsync();
+            return await _context.Rates.Where(r => r.UserId.Equals(userId) && r.GameId == gameId).FirstOrDefaultAsync();
         }
     }
 }

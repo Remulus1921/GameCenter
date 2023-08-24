@@ -5,5 +5,5 @@ namespace GameCenter.Core.Repositories.RatesRepository;
 
 public interface IRatesRepository : IGenericRepository<Rate>
 {
-    Task<Rate?> GetUserRate(string userId);
+    Task<Rate?> GetUserRate(string userId, Guid gameId);
 }
