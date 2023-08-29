@@ -1,4 +1,5 @@
 ﻿using GameCenter.Core.Services.GameService;
+using GameCenter.Dtos.GameDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameCenter.Controllers;
@@ -51,5 +52,12 @@ public class GamesController : ControllerBase
         }
 
         return Ok("Game successfully deleted");
+    }
+
+    [HttpPost("addGame")]
+    public async Task<IActionResult> AddGame([FromBody] GameAddDto game)
+    {
+        var result = await _gamesService.AddGame(game);
+        return Ok();
     }
 }
