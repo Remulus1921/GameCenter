@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameCenter.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230821091936_RefreshTokenTabAdded")]
-    partial class RefreshTokenTabAdded
+    [Migration("20230828085629_AddCompositeKeysToGameToPlatform")]
+    partial class AddCompositeKeysToGameToPlatform
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,11 +35,11 @@ namespace GameCenter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("GId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
@@ -50,20 +50,17 @@ namespace GameCenter.Migrations
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ReplyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CommentId");
+
                     b.HasIndex("GameId");
 
-                    b.HasIndex("ReplyId");
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("UserId");
 
@@ -87,6 +84,10 @@ namespace GameCenter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -106,25 +107,13 @@ namespace GameCenter.Migrations
 
             modelBuilder.Entity("GameCenter.Models.GameToPlatform", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("GId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("GameId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PlatformId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
+                    b.HasKey("GameId", "PlatformId");
 
                     b.HasIndex("PlatformId");
 
@@ -166,10 +155,8 @@ namespace GameCenter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Uid")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -181,24 +168,15 @@ namespace GameCenter.Migrations
 
             modelBuilder.Entity("GameCenter.Models.PostToPlatform", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Pid")
+                    b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PlatformId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
+                    b.HasKey("PostId", "PlatformId");
 
                     b.HasIndex("PlatformId");
-
-                    b.HasIndex("PostId");
 
                     b.ToTable("PostToPlatforms");
                 });
@@ -209,19 +187,14 @@ namespace GameCenter.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("GId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("GameRate")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -257,11 +230,8 @@ namespace GameCenter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -498,23 +468,30 @@ namespace GameCenter.Migrations
 
             modelBuilder.Entity("GameCenter.Models.Comment", b =>
                 {
+                    b.HasOne("GameCenter.Models.Comment", null)
+                        .WithMany("Replies")
+                        .HasForeignKey("CommentId");
+
                     b.HasOne("GameCenter.Models.Game", "Game")
                         .WithMany("GameComments")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GameCenter.Models.Comment", "Reply")
-                        .WithMany("Replies")
-                        .HasForeignKey("ReplyId");
+                    b.HasOne("GameCenter.Models.Comment", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Game");
 
-                    b.Navigation("Reply");
+                    b.Navigation("Parent");
 
                     b.Navigation("User");
                 });
@@ -542,7 +519,9 @@ namespace GameCenter.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -576,7 +555,9 @@ namespace GameCenter.Migrations
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Game");
 
@@ -591,7 +572,9 @@ namespace GameCenter.Migrations
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Parent");
 

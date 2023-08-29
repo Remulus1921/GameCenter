@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameCenter.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230821120648_ForeginKeyNameChanges")]
-    partial class ForeginKeyNameChanges
+    [Migration("20230828085448_DatabaseInit")]
+    partial class DatabaseInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,6 +35,9 @@ namespace GameCenter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -52,6 +55,8 @@ namespace GameCenter.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
 
                     b.HasIndex("GameId");
 
@@ -76,6 +81,10 @@ namespace GameCenter.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GameType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -165,21 +174,15 @@ namespace GameCenter.Migrations
 
             modelBuilder.Entity("GameCenter.Models.PostToPlatform", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PlatformId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
+                    b.HasKey("PostId", "PlatformId");
 
                     b.HasIndex("PlatformId");
-
-                    b.HasIndex("PostId");
 
                     b.ToTable("PostToPlatforms");
                 });
@@ -471,6 +474,10 @@ namespace GameCenter.Migrations
 
             modelBuilder.Entity("GameCenter.Models.Comment", b =>
                 {
+                    b.HasOne("GameCenter.Models.Comment", null)
+                        .WithMany("Replies")
+                        .HasForeignKey("CommentId");
+
                     b.HasOne("GameCenter.Models.Game", "Game")
                         .WithMany("GameComments")
                         .HasForeignKey("GameId")
@@ -478,8 +485,9 @@ namespace GameCenter.Migrations
                         .IsRequired();
 
                     b.HasOne("GameCenter.Models.Comment", "Parent")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentId");
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
