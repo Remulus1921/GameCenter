@@ -1,6 +1,6 @@
 ﻿namespace GameCenter.Dtos.GameDto;
 
-public class GameAddDto
+public class GameAddUpdateDto
 {
     public string Name { get; set; }
     public string GameType { get; set; }
