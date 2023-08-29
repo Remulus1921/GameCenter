@@ -17,9 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Platform> Platforms { get; set; }
     public DbSet<Rate> Rates { get; set; }
-    public DbSet<GameToPlatform> GameToPlatform { get; set; }
     public DbSet<Post> Posts { get; set; }
-    public DbSet<PostToPlatform> PostToPlatforms { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -40,6 +38,12 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Comment>()
+            .HasOne(c => c.Parent)
+            .WithMany()
+            .HasForeignKey(c => c.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Comment>()
             .HasOne(c => c.Game)
             .WithMany(g => g.GameComments)
             .HasForeignKey(c => c.GameId)
@@ -56,7 +60,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithOne(r => r.Game)
             .HasForeignKey(c => c.GameId)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 }
 

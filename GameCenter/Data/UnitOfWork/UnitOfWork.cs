@@ -1,4 +1,5 @@
-﻿using GameCenter.Core.Repositories.GameRepository;
+﻿using GameCenter.Core.Repositories.CommentsRepository;
+using GameCenter.Core.Repositories.GameRepository;
 using GameCenter.Core.Repositories.PlatformRepository;
 using GameCenter.Core.Repositories.RatesRepository;
 
@@ -9,7 +10,8 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
     public IPlatformsRepository Platforms { get; private set; }
     public IGamesRepository Games { get; private set; }
-    public IRatesRepository Rates { get; set; }
+    public IRatesRepository Rates { get; private set; }
+    public ICommentsRepository Comments { get; private set; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -17,6 +19,7 @@ public class UnitOfWork : IUnitOfWork
         Platforms = new PlatformsRepository(_context);
         Games = new GamesRepository(_context);
         Rates = new RatesRepository(_context);
+        Comments = new CommentsRepository(_context);
     }
 
     public async Task CompleteAsync()
