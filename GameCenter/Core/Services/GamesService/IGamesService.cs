@@ -7,4 +7,5 @@ public interface IGamesService
     Task<List<GameSmallDto>> GetGames();
     Task<GameDto?> GetGameById(Guid id);
     Task<bool> DeleteGame(Guid id);
+    Task<bool> AddGame(GameAddDto game);
 }
