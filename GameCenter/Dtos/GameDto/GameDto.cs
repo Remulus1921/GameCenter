@@ -1,4 +1,6 @@
-﻿namespace GameCenter.Dtos.GameDto
+﻿using GameCenter.Dtos.CommentDto;
+
+namespace GameCenter.Dtos.GameDto
 {
     public class GameDto
     {
@@ -12,5 +14,6 @@
         public string ImagePath { get; set; }
         public List<string> PlatformsName { get; set; }
         public List<int> GameRates { get; set; }
+        public List<CommentSmallDto> Comments { get; set; }
     }
 }
