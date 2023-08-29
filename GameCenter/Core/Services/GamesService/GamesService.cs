@@ -1,10 +1,10 @@
 ﻿using GameCenter.Data.UnitOfWork;
+using GameCenter.Dtos.CommentDto;
 using GameCenter.Dtos.GameDto;
 using GameCenter.Models;
 
 namespace GameCenter.Core.Services.GameService;
 
-//TODO Update
 public class GamesService : IGamesService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -14,7 +14,7 @@ public class GamesService : IGamesService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> AddGame(GameAddDto game)
+    public async Task<bool> AddGame(GameAddUpdateDto game)
     {
         var gamePlatforms = new List<Platform>();
 
@@ -59,7 +59,6 @@ public class GamesService : IGamesService
     }
 
 
-    // TODO dodać komentarze
     public async Task<GameDto?> GetGameById(Guid id)
     {
         var game = await _unitOfWork.Games.GetById(id);
@@ -79,6 +78,11 @@ public class GamesService : IGamesService
             ImagePath = game.ImagePath,
             PlatformsName = game.Platforms.Select(p => p.PlatformName).ToList(),
             GameRates = game.GameRates.Select(r => r.GameRate).ToList(),
+            Comments = game.GameComments.Select(c => new CommentSmallDto
+            {
+                CommentContent = c.CommentContent,
+                ParentId = c.ParentId
+            }).ToList(),
         };
 
         return gameDto;
@@ -102,5 +106,39 @@ public class GamesService : IGamesService
         }
 
         return gamesDtoList;
+    }
+
+    public async Task<bool> UpdateGame(GameAddUpdateDto game, Guid gameId)
+    {
+        var gameExists = await _unitOfWork.Games.GetById(gameId);
+
+        if (gameExists == null)
+        {
+            return false;
+        }
+
+        var gamePlatforms = new List<Platform>();
+
+        foreach (var platformName in game.Platforms)
+        {
+            var platform = await _unitOfWork.Platforms.GetByName(platformName);
+            if (platform == null)
+                continue;
+            gamePlatforms.Add(platform);
+        }
+
+        gameExists.Name = game.Name;
+        gameExists.GameType = game.GameType;
+        gameExists.Rating = game.Rating;
+        gameExists.Description = game.Description;
+        gameExists.Studio = game.Studio;
+        gameExists.Capacity = game.Capacity;
+        gameExists.ImagePath = game.ImagePath;
+        gameExists.Platforms = gamePlatforms;
+
+        await _unitOfWork.Games.Update(gameExists);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
     }
 }
