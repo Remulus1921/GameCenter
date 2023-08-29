@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace GameCenter.Core.Services.CommentsService;
 
-public class CommentService : ICommentService
+public class CommentsService : ICommentsService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<GameCenterUser> _userManager;
 
-    public CommentService(IUnitOfWork unitOfWork, UserManager<GameCenterUser> userManager)
+    public CommentsService(IUnitOfWork unitOfWork, UserManager<GameCenterUser> userManager)
     {
         _unitOfWork = unitOfWork;
         _userManager = userManager;
@@ -49,6 +49,20 @@ public class CommentService : ICommentService
         return true;
     }
 
+    public async Task<bool> DeleteComment(Guid commentId)
+    {
+        var commentExists = await _unitOfWork.Comments.GetById(commentId);
+        if (commentExists == null)
+        {
+            return false;
+        }
+
+        await _unitOfWork.Comments.Delete(commentExists);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
+    }
+
     public async Task<List<CommentDto>?> GetGameComments(Guid gameId)
     {
         var commentList = await _unitOfWork.Comments.GetByGame(gameId);
@@ -73,5 +87,23 @@ public class CommentService : ICommentService
         }
 
         return commentDtoList;
+    }
+
+    public async Task<bool> UpdateComment(Guid commentId, CommentSmallDto comment)
+    {
+        var commentExists = await _unitOfWork.Comments.GetById(commentId);
+        if (commentExists == null)
+        {
+            return false;
+        }
+
+        commentExists.CommentContent = comment.CommentContent;
+        commentExists.ParentId = comment.ParentId;
+        commentExists.ModificationDate = DateTime.Now;
+
+        await _unitOfWork.Comments.Update(commentExists);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
     }
 }
