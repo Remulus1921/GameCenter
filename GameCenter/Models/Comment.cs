@@ -7,7 +7,7 @@ public class Comment
 {
     public Guid Id { get; set; }
     public string CommentContent { get; set; }
-    public DateTime CreationDate { get; set; }
+    public DateTime CreationDate { get; set; } = DateTime.Now;
     public DateTime ModificationDate { get; set; }
     public Game Game { get; set; }
     public Guid GameId { get; set; }
@@ -15,6 +15,6 @@ public class Comment
     public string UserId { get; set; }
     public Comment? Parent { get; set; }
     public Guid? ParentId { get; set; }
-    public ICollection<Comment> Replies { get; set; }
+    public ICollection<Comment>? Replies { get; set; }
 
 }

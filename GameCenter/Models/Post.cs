@@ -13,4 +13,5 @@ public class Post
     public string? ImagePath { get; set; }
     public IdentityUser User { get; set; }
     public string UserId { get; set; }
+    public ICollection<Platform> Platforms { get; set; }
 }
