@@ -11,5 +11,6 @@
         public int Capacity { get; set; }
         public string ImagePath { get; set; }
         public List<string> PlatformsName { get; set; }
+        public List<int> GameRates { get; set; }
     }
 }
