@@ -30,7 +30,7 @@ public class GamesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("/{gameId}")]
+    [HttpGet("{gameId}")]
     public async Task<IActionResult> GetGameById([FromRoute] Guid gameId)
     {
         var result = await _gamesService.GetGameById(gameId);
@@ -42,11 +42,11 @@ public class GamesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete("/{gameId}")]
+    [HttpDelete("{gameId}")]
     public async Task<IActionResult> DeleteGame([FromRoute] Guid gameId)
     {
         var result = await _gamesService.DeleteGame(gameId);
-        if (result == false)
+        if (!result)
         {
             return NotFound();
         }
@@ -55,9 +55,20 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("addGame")]
-    public async Task<IActionResult> AddGame([FromBody] GameAddDto game)
+    public async Task<IActionResult> AddGame([FromBody] GameAddUpdateDto game)
     {
         var result = await _gamesService.AddGame(game);
         return Ok();
     }
+
+    [HttpPut("{gameId}")]
+    public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId, [FromBody] GameAddUpdateDto game)
+    {
+        var result = await _gamesService.UpdateGame(game, gameId);
+        if (result == false)
+            return NotFound();
+
+        return Ok();
+    }
+
 }

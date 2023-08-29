@@ -3,47 +3,68 @@ using GameCenter.Dtos.CommentDto;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace GameCenter.Controllers
+namespace GameCenter.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class CommentsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CommentsController : ControllerBase
+    private readonly ICommentsService _commentService;
+
+    public CommentsController(ICommentsService commentService)
     {
-        private readonly ICommentService _commentService;
+        _commentService = commentService;
+    }
 
-        public CommentsController(ICommentService commentService)
+    [HttpGet("{gameId}")]
+    public async Task<IActionResult> GameComments([FromRoute] Guid gameId)
+    {
+        var result = await _commentService.GetGameComments(gameId);
+
+        if (result == null)
         {
-            _commentService = commentService;
+            return NotFound("Game Not yet been commented");
         }
 
-        [HttpGet("{gameId}")]
-        public async Task<IActionResult> GameComments([FromRoute] Guid gameId)
+        return Ok(result);
+    }
+
+    [HttpPost("{gameId}")]
+    public async Task<IActionResult> AddComment([FromRoute] Guid gameId, [FromBody] CommentSmallDto comment)
+    {
+        var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+        if (emailClaim == null)
         {
-            var result = _commentService.GetGameComments(gameId);
+            return NotFound("No email claim in authorization");
+        }
+        string email = emailClaim.Value;
 
-            if (result == null)
-            {
-                return NotFound("Game Not yet been commented");
-            }
+        var result = await _commentService.AddComment(gameId, email, comment);
 
-            return Ok(result);
+        return Ok("Comment Successfullt added");
+    }
+
+    [HttpPut("{commentId}")]
+    public async Task<IActionResult> UpdateComment([FromRoute] Guid commentId, [FromBody] CommentSmallDto comment)
+    {
+        var result = await _commentService.UpdateComment(commentId, comment);
+
+        if (!result)
+        {
+            return NotFound();
         }
 
-        [HttpPost("{gameId}")]
-        public async Task<IActionResult> AddComment([FromRoute] Guid gameId, [FromBody] CommentSmallDto comment)
-        {
-            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            if (emailClaim == null)
-            {
-                return NotFound("No email claim in authorization");
-            }
-            string email = emailClaim.Value;
+        return Ok();
+    }
 
-            var result = await _commentService.AddComment(gameId, email, comment);
+    [HttpDelete("{commentId}")]
+    public async Task<IActionResult> DeleteComment([FromRoute] Guid commentId)
+    {
+        var result = await _commentService.DeleteComment(commentId);
 
+        if (!result)
+            return NotFound();
 
-
-            return Ok("Comment Successfullt added");
-        }
+        return NoContent();
     }
 }

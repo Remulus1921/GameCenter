@@ -2,67 +2,66 @@
 using GameCenter.Dtos.PlatformDto;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GameCenter.Controllers
+namespace GameCenter.Controllers;
+
+[Route("[controller]")]
+[ApiController]
+public class PlatformsController : ControllerBase
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class PlatformsController : ControllerBase
+    private readonly IPlatformsService _platformService;
+
+    public PlatformsController(IPlatformsService platformService)
     {
-        private readonly IPlatformsService _platformService;
+        _platformService = platformService;
+    }
 
-        public PlatformsController(IPlatformsService platformService)
+    [HttpGet]
+    public async Task<IActionResult> GetPlatforms()
+    {
+        var result = await _platformService.GetPlatforms();
+
+        if (!result.Any())
         {
-            _platformService = platformService;
+            return NoContent();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPlatforms()
+        return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddPlatform([FromBody] PlatformDto platformDto)
+    {
+        var result = await _platformService.AddPlatform(platformDto);
+
+        if (!result)
         {
-            var result = await _platformService.GetPlatforms();
-
-            if (!result.Any())
-            {
-                return NoContent();
-            }
-
-            return Ok(result);
+            return BadRequest("Platform with given name already exists");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddPlatform([FromBody] PlatformDto platformDto)
+        return Ok();
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeletePlatform([FromBody] PlatformDto platformDto)
+    {
+        var result = await _platformService.DeletePlatform(platformDto);
+        if (!result)
         {
-            var result = await _platformService.AddPlatform(platformDto);
-
-            if (!result)
-            {
-                return BadRequest("Platform with given name already exists");
-            }
-
-            return Ok();
+            return BadRequest("There is no platform with provided name");
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeletePlatform([FromBody] PlatformDto platformDto)
-        {
-            var result = await _platformService.DeletePlatform(platformDto);
-            if (!result)
-            {
-                return BadRequest("There is no platform with provided name");
-            }
+        return Ok();
+    }
 
-            return Ok();
+    [HttpPut("/{newName}")]
+    public async Task<IActionResult> UpdatePlatform([FromBody] PlatformDto platformDto, [FromRoute] string newName)
+    {
+        var result = await _platformService.UpdatePlatform(platformDto, newName);
+        if (!result)
+        {
+            return BadRequest("No platform");
         }
 
-        [HttpPut("/{newName}")]
-        public async Task<IActionResult> UpdatePlatform([FromBody] PlatformDto platformDto, [FromRoute] string newName)
-        {
-            var result = await _platformService.UpdatePlatform(platformDto, newName);
-            if (!result)
-            {
-                return BadRequest("No platform");
-            }
-
-            return Ok();
-        }
+        return Ok();
     }
 }
