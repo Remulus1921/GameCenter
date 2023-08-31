@@ -38,7 +38,6 @@ public class PostsService : IPostsService
         {
             Title = post.Title,
             Content = post.Content,
-            Created = DateTime.Now,
             Modified = DateTime.Now,
             ImagePath = post.ImagePath,
             User = user,
