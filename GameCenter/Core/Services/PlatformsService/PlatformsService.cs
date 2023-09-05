@@ -13,7 +13,7 @@ public class PlatformsService : IPlatformsService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<List<PlatformDto>> GetPlatforms()
+    public async Task<List<PlatformDto>?> GetPlatforms()
     {
         var platforms = await _unitOfWork.Platforms.All();
         var platformDtoList = new List<PlatformDto>();
@@ -26,7 +26,11 @@ public class PlatformsService : IPlatformsService
             });
         }
 
-        return platformDtoList;
+        if (platformDtoList.Count > 0)
+        {
+            return platformDtoList;
+        }
+        return null;
     }
 
     public async Task<bool> AddPlatform(PlatformDto platformDto)
