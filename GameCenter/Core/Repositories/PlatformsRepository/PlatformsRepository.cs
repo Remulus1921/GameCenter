@@ -3,37 +3,39 @@ using GameCenter.Data;
 using GameCenter.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GameCenter.Core.Repositories.PlatformRepository;
-
-public class PlatformsRepository : GenericRepository<Platform>, IPlatformsRepository
+namespace GameCenter.Core.Repositories.PlatformRepository
 {
-    public PlatformsRepository(ApplicationDbContext context) : base(context)
-    {
-    }
 
-    public override async Task<IEnumerable<Platform>> All()
+    public class PlatformsRepository : GenericRepository<Platform>, IPlatformsRepository
     {
-        try
+        public PlatformsRepository(ApplicationDbContext context) : base(context)
         {
-            return await _context.Platforms.ToListAsync();
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
 
-    public async Task<Platform?> GetByName(string name)
-    {
-        try
+        public override async Task<IEnumerable<Platform>> All()
         {
-            return await _context.Platforms.Where(p => p.PlatformName == name).FirstOrDefaultAsync();
+            try
+            {
+                return await _context.Platforms.ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
-        catch (Exception e)
+
+        public async Task<Platform?> GetByName(string name)
         {
-            Console.WriteLine(e);
-            throw;
+            try
+            {
+                return await _context.Platforms.Where(p => p.PlatformName == name).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

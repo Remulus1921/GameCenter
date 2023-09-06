@@ -4,14 +4,16 @@ using GameCenter.Core.Repositories.PlatformRepository;
 using GameCenter.Core.Repositories.PostsRepository;
 using GameCenter.Core.Repositories.RatesRepository;
 
-namespace GameCenter.Data.UnitOfWork;
-
-public interface IUnitOfWork
+namespace GameCenter.Data.UnitOfWork
 {
-    IPlatformsRepository Platforms { get; }
-    IGamesRepository Games { get; }
-    IRatesRepository Rates { get; }
-    ICommentsRepository Comments { get; }
-    IPostsRepository Posts { get; }
-    Task CompleteAsync();
+
+    public interface IUnitOfWork
+    {
+        IPlatformsRepository Platforms { get; }
+        IGamesRepository Games { get; }
+        IRatesRepository Rates { get; }
+        ICommentsRepository Comments { get; }
+        IPostsRepository Posts { get; }
+        Task CompleteAsync();
+    }
 }

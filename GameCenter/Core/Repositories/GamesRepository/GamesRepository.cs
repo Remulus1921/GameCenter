@@ -2,11 +2,13 @@
 using GameCenter.Data;
 using GameCenter.Models;
 
-namespace GameCenter.Core.Repositories.GameRepository;
-
-public class GamesRepository : GenericRepository<Game>, IGamesRepository
+namespace GameCenter.Core.Repositories.GameRepository
 {
-    public GamesRepository(ApplicationDbContext context) : base(context)
+
+    public class GamesRepository : GenericRepository<Game>, IGamesRepository
     {
+        public GamesRepository(ApplicationDbContext context) : base(context)
+        {
+        }
     }
 }

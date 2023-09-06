@@ -1,7 +1,9 @@
-﻿namespace GameCenter.Models.User;
-
-public class MyResponse
+﻿namespace GameCenter.Models.User
 {
-    public string? Status { get; set; }
-    public string? Message { get; set; }
+
+    public class MyResponse
+    {
+        public string? Status { get; set; }
+        public string? Message { get; set; }
+    }
 }

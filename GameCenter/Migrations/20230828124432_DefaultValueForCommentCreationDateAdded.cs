@@ -2,20 +2,21 @@
 
 #nullable disable
 
-namespace GameCenter.Migrations;
-
-/// <inheritdoc />
-public partial class DefaultValueForCommentCreationDateAdded : Migration
+namespace GameCenter.Migrations
 {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
+    public partial class DefaultValueForCommentCreationDateAdded : Migration
     {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
 
-    }
+        }
 
-    /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
 
+        }
     }
 }

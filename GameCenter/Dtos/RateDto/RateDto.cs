@@ -1,7 +1,8 @@
-﻿namespace GameCenter.Dtos.RateDto;
-
-public class RateDto
+﻿namespace GameCenter.Dtos.RateDto
 {
-    public float AvarageRate { get; set; }
-    public int AmountOfRates { get; set; }
+    public class RateDto
+    {
+        public float AvarageRate { get; set; }
+        public int AmountOfRates { get; set; }
+    }
 }

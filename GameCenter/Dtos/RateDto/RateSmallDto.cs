@@ -1,6 +1,8 @@
-﻿namespace GameCenter.Dtos.RateDto;
-
-public class RateSmallDto
+﻿namespace GameCenter.Dtos.RateDto
 {
-    public int? GameRate { get; set; }
+
+    public class RateSmallDto
+    {
+        public int? GameRate { get; set; }
+    }
 }

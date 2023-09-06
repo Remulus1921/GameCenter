@@ -1,6 +1,7 @@
-﻿namespace GameCenter.Dtos.PlatformDto;
-
-public class PlatformDto
+﻿namespace GameCenter.Dtos.PlatformDto
 {
-    public string Name { get; set; }
+    public class PlatformDto
+    {
+        public string Name { get; set; }
+    }
 }

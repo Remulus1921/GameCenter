@@ -1,9 +1,11 @@
 ﻿using GameCenter.Core.Repositories.GenericRepository;
 using GameCenter.Models;
 
-namespace GameCenter.Core.Repositories.PlatformRepository;
-
-public interface IPlatformsRepository : IGenericRepository<Platform>
+namespace GameCenter.Core.Repositories.PlatformRepository
 {
-    Task<Platform?> GetByName(string name);
+
+    public interface IPlatformsRepository : IGenericRepository<Platform>
+    {
+        Task<Platform?> GetByName(string name);
+    }
 }

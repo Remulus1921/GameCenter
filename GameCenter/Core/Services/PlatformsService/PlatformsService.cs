@@ -2,83 +2,88 @@
 using GameCenter.Dtos.PlatformDto;
 using GameCenter.Models;
 
-namespace GameCenter.Core.Services.PlatformService;
-
-public class PlatformsService : IPlatformsService
+namespace GameCenter.Core.Services.PlatformService
 {
-    private readonly IUnitOfWork _unitOfWork;
 
-    public PlatformsService(IUnitOfWork unitOfWork)
+    public class PlatformsService : IPlatformsService
     {
-        _unitOfWork = unitOfWork;
-    }
+        private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<List<PlatformDto>?> GetPlatforms()
-    {
-        var platforms = await _unitOfWork.Platforms.All();
-        var platformDtoList = new List<PlatformDto>();
-
-        foreach (var platform in platforms)
+        public PlatformsService(IUnitOfWork unitOfWork)
         {
-            platformDtoList.Add(new PlatformDto
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<List<PlatformDto>?> GetPlatforms()
+        {
+            var platforms = await _unitOfWork.Platforms.All();
+            var platformDtoList = new List<PlatformDto>();
+
+            foreach (var platform in platforms)
             {
-                Name = platform.PlatformName
-            });
+                platformDtoList.Add(new PlatformDto
+                {
+                    Name = platform.PlatformName
+                });
+            }
+
+            if (platformDtoList.Count > 0)
+            {
+                return platformDtoList;
+            }
+            return null;
         }
 
-        if (platformDtoList.Count > 0)
+        public async Task<bool> AddPlatform(PlatformDto platformDto)
         {
-            return platformDtoList;
-        }
-        return null;
-    }
+            var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
 
-    public async Task<bool> AddPlatform(PlatformDto platformDto)
-    {
-        var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
+            if (platform != null)
+            {
+                return false;
+            }
 
-        if (platform != null)
-        {
-            return false;
-        }
+            Platform newPlatform = new Platform
+            {
+                PlatformName = platformDto.Name
+            };
 
-        Platform newPlatform = new Platform
-        {
-            PlatformName = platformDto.Name
-        };
+            await _unitOfWork.Platforms.Add(newPlatform);
+            await _unitOfWork.CompleteAsync();
 
-        await _unitOfWork.Platforms.Add(newPlatform);
-        await _unitOfWork.CompleteAsync();
-
-        return true;
-    }
-
-    public async Task<bool> DeletePlatform(PlatformDto platformDto)
-    {
-        var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
-
-        if (platform == null)
-        {
-            return false;
+            return true;
         }
 
-        return await _unitOfWork.Platforms.Delete(platform);
-    }
-
-    public async Task<bool> UpdatePlatform(PlatformDto platformDto, string newName)
-    {
-        var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
-
-        if (platform == null)
+        public async Task<bool> DeletePlatform(PlatformDto platformDto)
         {
-            return false;
+            var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
+
+            if (platform == null)
+            {
+                return false;
+            }
+
+            await _unitOfWork.Platforms.Delete(platform);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
         }
 
-        platform.PlatformName = newName;
+        public async Task<bool> UpdatePlatform(PlatformDto platformDto, string newName)
+        {
+            var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
 
-        await _unitOfWork.Platforms.Update(platform);
-        await _unitOfWork.CompleteAsync();
+            if (platform == null)
+            {
+                return false;
+            }
 
-        return true;
+            platform.PlatformName = newName;
+
+            await _unitOfWork.Platforms.Update(platform);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
     }
 }
