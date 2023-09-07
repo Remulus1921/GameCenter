@@ -1,4 +1,5 @@
 ﻿using GameCenter.Core.Services.AuthService;
+using GameCenter.Dtos.UserDto;
 using GameCenter.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,8 +39,11 @@ namespace GameCenter.Controllers
                 };
 
                 Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
-
-                return Ok(message);
+                var tokenDto = new TokenDto
+                {
+                    Token = message,
+                };
+                return Ok(tokenDto);
             }
             catch (Exception ex)
             {
