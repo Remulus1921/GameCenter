@@ -31,6 +31,19 @@ namespace GameCenter.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{platformId}")]
+        public async Task<IActionResult> GetPlatformById([FromRoute] Guid platformId)
+        {
+            var result = await _platformService.GetPlatformById(platformId);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddPlatform([FromBody] PlatformDto platformDto)
         {
@@ -56,10 +69,10 @@ namespace GameCenter.Controllers
             return NoContent();
         }
 
-        [HttpPut("/{newName}")]
-        public async Task<IActionResult> UpdatePlatform([FromBody] PlatformDto platformDto, [FromRoute] string newName)
+        [HttpPut("update-platform")]
+        public async Task<IActionResult> UpdatePlatform([FromBody] PlatformDto platformDto)
         {
-            var result = await _platformService.UpdatePlatform(platformDto, newName);
+            var result = await _platformService.UpdatePlatform(platformDto);
             if (!result)
             {
                 return BadRequest("No platform");

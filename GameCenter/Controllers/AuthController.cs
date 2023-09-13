@@ -1,5 +1,4 @@
 ﻿using GameCenter.Core.Services.AuthService;
-using GameCenter.Dtos.UserDto;
 using GameCenter.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,11 +38,8 @@ namespace GameCenter.Controllers
                 };
 
                 Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
-                var tokenDto = new TokenDto
-                {
-                    Token = message,
-                };
-                return Ok(tokenDto);
+
+                return Ok(new { token = message });
             }
             catch (Exception ex)
             {
@@ -76,7 +72,7 @@ namespace GameCenter.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string userName)
+        public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
             var refreshToken = Request.Cookies["refreshToken"];
             if (refreshToken == null)
