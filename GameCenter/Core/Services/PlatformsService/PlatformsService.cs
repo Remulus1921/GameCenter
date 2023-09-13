@@ -23,6 +23,7 @@ namespace GameCenter.Core.Services.PlatformService
             {
                 platformDtoList.Add(new PlatformDto
                 {
+                    Id = platform.Id,
                     Name = platform.PlatformName
                 });
             }
@@ -69,21 +70,39 @@ namespace GameCenter.Core.Services.PlatformService
             return true;
         }
 
-        public async Task<bool> UpdatePlatform(PlatformDto platformDto, string newName)
+        public async Task<bool> UpdatePlatform(PlatformDto platformDto)
         {
-            var platform = await _unitOfWork.Platforms.GetByName(platformDto.Name);
+            var platform = await _unitOfWork.Platforms.GetById(platformDto.Id);
 
             if (platform == null)
             {
                 return false;
             }
 
-            platform.PlatformName = newName;
+            platform.PlatformName = platformDto.Name;
 
             await _unitOfWork.Platforms.Update(platform);
             await _unitOfWork.CompleteAsync();
 
             return true;
+        }
+
+        public async Task<PlatformDto?> GetPlatformById(Guid platformId)
+        {
+            var platform = await _unitOfWork.Platforms.GetById(platformId);
+
+            if (platform == null)
+            {
+                return null;
+            }
+
+            var platformDto = new PlatformDto
+            {
+                Id = platform.Id,
+                Name = platform.PlatformName,
+            };
+
+            return platformDto;
         }
     }
 }

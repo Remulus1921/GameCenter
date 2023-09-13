@@ -71,9 +71,9 @@ namespace GameCenter.Core.Services.AuthService
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return (0, "Invalid Email", null);
+                return (0, "Email or Password was invalid", null);
             if (!await _userManager.CheckPasswordAsync(user, model.Password))
-                return (0, "Invalid Password", null);
+                return (0, "Email or Password was invalid", null);
 
             string token = await GenerateToken(user);
 
