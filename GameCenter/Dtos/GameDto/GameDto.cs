@@ -13,7 +13,7 @@ namespace GameCenter.Dtos.GameDto
         public int Capacity { get; set; }
         public string ImagePath { get; set; }
         public List<string> PlatformsName { get; set; }
-        public List<int> GameRates { get; set; }
-        public List<CommentSmallDto> Comments { get; set; }
+        public List<int>? GameRates { get; set; }
+        public List<CommentSmallDto>? Comments { get; set; }
     }
 }
