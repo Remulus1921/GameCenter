@@ -8,7 +8,7 @@ using System.Security.Claims;
 namespace GameCenter.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PostsController : ControllerBase
     {

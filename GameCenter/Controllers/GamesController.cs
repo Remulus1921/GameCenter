@@ -77,7 +77,7 @@ namespace GameCenter.Controllers
             if (!result)
                 return NotFound();
 
-            return Ok();
+            return Ok("Game successfully updated");
         }
 
     }
