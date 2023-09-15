@@ -69,7 +69,6 @@ namespace GameCenter.Core.Services.GameService
             {
                 return null;
             }
-
             var gameDto = new GameDto
             {
                 Id = game.Id,
@@ -79,9 +78,10 @@ namespace GameCenter.Core.Services.GameService
                 Studio = game.Studio,
                 Capacity = game.Capacity,
                 ImagePath = game.ImagePath,
-                PlatformsName = game.Platforms.Select(p => p.PlatformName).ToList(),
-                GameRates = game.GameRates.Select(r => r.GameRate).ToList(),
-                Comments = game.GameComments.Select(c => new CommentSmallDto
+                Rating = game.Rating,
+                PlatformsName = game.Platforms?.Select(p => p.PlatformName).ToList(),
+                GameRates = game.GameRates?.Select(r => r.GameRate).ToList(),
+                Comments = game.GameComments?.Select(c => new CommentSmallDto
                 {
                     CommentContent = c.CommentContent,
                     ParentId = c.ParentId
