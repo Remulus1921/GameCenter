@@ -53,6 +53,15 @@ namespace GameCenter.Core.Services.RatesService
                 return null;
             }
 
+            if (game.GameRates.Count == 0)
+            {
+                return new RateDto
+                {
+                    AmountOfRates = 0,
+                    AvarageRate = 0,
+                };
+            }
+
             int rateSum = 0;
             foreach (var rate in game.GameRates)
             {
