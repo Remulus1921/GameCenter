@@ -1,4 +1,4 @@
-﻿using GameCenter.Dtos.CommentDto;
+﻿using GameCenter.Dtos.CommentDtos;
 
 namespace GameCenter.Core.Services.CommentsService
 {

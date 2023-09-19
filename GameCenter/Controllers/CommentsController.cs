@@ -1,5 +1,5 @@
 ﻿using GameCenter.Core.Services.CommentsService;
-using GameCenter.Dtos.CommentDto;
+using GameCenter.Dtos.CommentDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

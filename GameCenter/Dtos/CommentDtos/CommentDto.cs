@@ -1,4 +1,4 @@
-﻿namespace GameCenter.Dtos.CommentDto
+﻿namespace GameCenter.Dtos.CommentDtos
 {
 
     public class CommentDto
