@@ -1,5 +1,5 @@
 ﻿using GameCenter.Data.UnitOfWork;
-using GameCenter.Dtos.CommentDto;
+using GameCenter.Dtos.CommentDtos;
 using GameCenter.Dtos.GameDto;
 using GameCenter.Models;
 
@@ -81,8 +81,12 @@ namespace GameCenter.Core.Services.GameService
                 Rating = game.Rating,
                 PlatformsName = game.Platforms?.Select(p => p.PlatformName).ToList(),
                 GameRates = game.GameRates?.Select(r => r.GameRate).ToList(),
-                Comments = game.GameComments?.Select(c => new CommentSmallDto
+                Comments = game.GameComments?.Select(c => new CommentDto
                 {
+                    Id = c.Id,
+                    UserName = c.User.UserName,
+                    CreationDate = c.CreationDate,
+                    ModificationDate = c.ModificationDate,
                     CommentContent = c.CommentContent,
                     ParentId = c.ParentId
                 }).ToList(),
