@@ -17,7 +17,8 @@ namespace GameCenter.Core.Repositories.GameRepository
             return await _context.Games
                 .Include(g => g.Platforms)
                 .Include(g => g.GameRates)
-                .Include(g => g.GameRates)
+                .Include(g => g.GameComments)
+                .ThenInclude(c => (c as Comment).User)
                 .FirstOrDefaultAsync(g => g.Id == id);
         }
     }
