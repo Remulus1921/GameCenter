@@ -1,4 +1,6 @@
-﻿namespace GameCenter.Dtos.GameDto
+﻿using GameCenter.Dtos.FileDtos;
+
+namespace GameCenter.Dtos.GameDto
 {
 
     public class GameSmallDto
@@ -7,6 +9,6 @@
         public string Name { get; set; }
         public string GameType { get; set; }
         public string Rating { get; set; }
-        public string ImagePath { get; set; }
+        public FileDto Image { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using GameCenter.Dtos.CommentDtos;
+using GameCenter.Dtos.FileDtos;
 
 namespace GameCenter.Dtos.GameDto
 {
@@ -11,7 +12,7 @@ namespace GameCenter.Dtos.GameDto
         public string Studio { get; set; }
         public string Rating { get; set; }
         public int Capacity { get; set; }
-        public string ImagePath { get; set; }
+        public FileDto Image { get; set; }
         public List<string> PlatformsName { get; set; }
         public List<int>? GameRates { get; set; }
         public List<CommentDto>? Comments { get; set; }

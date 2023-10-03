@@ -58,8 +58,13 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPost("addGame")]
-        public async Task<IActionResult> AddGame([FromBody] GameAddUpdateDto game)
+        public async Task<IActionResult> AddGame([FromBody] GameAddUpdateDto game, [FromForm] IFormFile image)
         {
+            if (image != null)
+            {
+                game.Image = image;
+            }
+
             var result = await _gamesService.AddGame(game);
             if (!result)
             {
@@ -71,8 +76,13 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPut("{gameId}")]
-        public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId, [FromBody] GameAddUpdateDto game)
+        public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId, [FromBody] GameAddUpdateDto game, [FromForm] IFormFile image)
         {
+            if (image != null)
+            {
+                game.Image = image;
+            }
+
             var result = await _gamesService.UpdateGame(game, gameId);
             if (!result)
                 return NotFound();

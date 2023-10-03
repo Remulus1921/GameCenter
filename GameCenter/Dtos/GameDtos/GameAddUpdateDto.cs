@@ -9,7 +9,7 @@
         public string Studio { get; set; }
         public string Rating { get; set; }
         public int Capacity { get; set; }
-        public string ImagePath { get; set; }
+        public IFormFile Image { get; set; }
         public List<string> Platforms { get; set; }
     }
 }
