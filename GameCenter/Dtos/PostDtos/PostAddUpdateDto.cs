@@ -5,7 +5,7 @@
     {
         public string Title { get; set; }
         public string Content { get; set; }
-        public string? ImagePath { get; set; }
+        public IFormFile? Image { get; set; }
         public List<string> Platforms { get; set; }
     }
 }

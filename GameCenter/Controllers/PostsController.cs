@@ -60,8 +60,13 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPut("{postId}")]
-        public async Task<IActionResult> UpdatePost([FromRoute] Guid postId, [FromBody] PostAddUpdateDto post)
+        public async Task<IActionResult> UpdatePost([FromRoute] Guid postId, [FromBody] PostAddUpdateDto post, [FromForm] IFormFile image)
         {
+            if (image != null)
+            {
+                post.Image = image;
+            }
+
             var result = await _postsService.UpdatePost(postId, post);
 
             if (!result)
@@ -74,8 +79,13 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPost]
-        public async Task<IActionResult> AddPost([FromBody] PostAddUpdateDto post)
+        public async Task<IActionResult> AddPost([FromBody] PostAddUpdateDto post, [FromForm] IFormFile image)
         {
+            if (image != null)
+            {
+                post.Image = image;
+            }
+
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
             {

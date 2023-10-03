@@ -1,5 +1,6 @@
 ﻿using GameCenter.Data;
 using GameCenter.Data.UnitOfWork;
+using GameCenter.Dtos.FileDtos;
 using GameCenter.Dtos.PostDto;
 using GameCenter.Models;
 using Microsoft.AspNetCore.Identity;
@@ -11,15 +12,23 @@ namespace GameCenter.Core.Services.PostsService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<GameCenterUser> _userManager;
+        private readonly string _uploadsFolder;
 
-        public PostsService(IUnitOfWork unitOfWork, UserManager<GameCenterUser> userManager)
+        public PostsService(IUnitOfWork unitOfWork, UserManager<GameCenterUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _uploadsFolder = Path.Combine(webHostEnvironment.ContentRootPath, "Resources/Images");
         }
 
         public async Task<bool> AddPost(PostAddUpdateDto post, string email)
         {
+            string uniqueName = string.Empty;
+            if (post.Image != null)
+            {
+                uniqueName = this.AddFile(post.Image);
+            }
+
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
@@ -40,7 +49,7 @@ namespace GameCenter.Core.Services.PostsService
                 Title = post.Title,
                 Content = post.Content,
                 Modified = DateTime.Now,
-                ImagePath = post.ImagePath,
+                ImageName = post.Image != null ? uniqueName : null,
                 User = user,
                 Platforms = platforms
             };
@@ -65,7 +74,7 @@ namespace GameCenter.Core.Services.PostsService
                 Content = post.Content,
                 Created = post.Created,
                 Modified = post.Modified,
-                ImagePath = post.ImagePath,
+                Image = post.ImageName != null ? this.FindFile(post.ImageName) : null,
                 UserName = post.User.UserName,
                 Platforms = post.Platforms.Select(p => p.PlatformName).ToList(),
             };
@@ -92,7 +101,7 @@ namespace GameCenter.Core.Services.PostsService
                     Title = post.Title,
                     Created = post.Created,
                     Modified = post.Modified,
-                    ImagePath = post.ImagePath,
+                    Image = post.ImageName != null ? this.FindFile(post.ImageName) : null,
                     UserName = post.User.UserName!,
                     Platforms = post.Platforms.Select(p => p.PlatformName).ToList(),
                 });
@@ -109,9 +118,13 @@ namespace GameCenter.Core.Services.PostsService
                 return false;
             }
 
+            if (post.ImageName != null)
+            {
+                this.DeleteFile(post.ImageName);
+            }
+
             await _unitOfWork.Posts.Delete(post);
             await _unitOfWork.CompleteAsync();
-
             return true;
         }
 
@@ -133,16 +146,78 @@ namespace GameCenter.Core.Services.PostsService
                 platforms.Add(platform);
             }
 
+            string uniqueName = string.Empty;
+
+            if (post.Image != null && postExists.ImageName != null)
+            {
+                this.DeleteFile(postExists.ImageName);
+                uniqueName = this.AddFile(post.Image);
+            }
+            else if (post.Image != null && postExists.ImageName == null)
+            {
+                uniqueName = this.AddFile(post.Image);
+            }
+
             postExists.Title = post.Title;
             postExists.Content = post.Content;
             postExists.Modified = DateTime.Now;
             postExists.Platforms = platforms;
-            postExists.ImagePath = post.ImagePath;
+            postExists.ImageName = post.Image != null ? uniqueName : null;
 
             await _unitOfWork.Posts.Update(postExists);
             await _unitOfWork.CompleteAsync();
 
             return true;
+        }
+        private void DeleteFile(string fileName)
+        {
+            string[] matchingFiles = Directory.GetFiles(_uploadsFolder, fileName + ".jpg");
+
+            if (matchingFiles.Any())
+            {
+                File.Delete(matchingFiles.First());
+            }
+            else
+            {
+                throw new Exception($"File with provided file name: \"{fileName}\" doesnt exist");
+            }
+        }
+
+        private string AddFile(IFormFile file)
+        {
+            string uniqueName = Guid.NewGuid().ToString();
+
+            string path = Path.Combine(_uploadsFolder, uniqueName + Path.GetExtension(file.FileName));
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+
+            return uniqueName;
+        }
+
+        private FileDto FindFile(string fileName)
+        {
+            string[] matchingFile = Directory.GetFiles(_uploadsFolder, fileName + ".jpg");
+
+            if (matchingFile.Any())
+            {
+                byte[] fileContent = File.ReadAllBytes(matchingFile.First());
+                string content = Convert.ToBase64String(fileContent);
+
+                FileDto file = new FileDto()
+                {
+                    FileContent = content,
+                    FileName = fileName,
+                    FileType = "image/jpeg",
+                };
+                return file;
+            }
+            else
+            {
+                throw new Exception($"File with provided file name: \"{fileName}\" doesnt exist");
+            }
         }
     }
 }
