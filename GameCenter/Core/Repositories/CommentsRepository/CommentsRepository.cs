@@ -1,6 +1,7 @@
 ﻿using GameCenter.Core.Repositories.GenericRepository;
 using GameCenter.Data;
 using GameCenter.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameCenter.Core.Repositories.CommentsRepository
 {
@@ -13,7 +14,7 @@ namespace GameCenter.Core.Repositories.CommentsRepository
 
         public async Task<List<Comment>?> GetByGame(Guid gameId)
         {
-            return _context.Comments.Where(c => c.GameId == gameId).ToList();
+            return _context.Comments.Include(c => c.User).Where(c => c.GameId == gameId).ToList();
         }
     }
 }

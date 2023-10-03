@@ -78,10 +78,12 @@ namespace GameCenter.Core.Services.CommentsService
             {
                 commentDtoList.Add(new CommentDto
                 {
+                    Id = comment.Id,
                     CommentContent = comment.CommentContent,
                     CreationDate = comment.CreationDate,
                     ModificationDate = comment.ModificationDate,
                     UserName = comment.User.UserName!,
+                    UserEmail = comment.User.Email!,
                     ParentId = comment.ParentId,
                 });
             }
