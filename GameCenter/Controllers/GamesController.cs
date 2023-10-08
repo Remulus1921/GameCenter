@@ -58,17 +58,22 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPost("addGame")]
-        public async Task<IActionResult> AddGame([FromBody] GameAddUpdateDto game, [FromForm] IFormFile image)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> AddGame([FromForm] GameAddUpdateDto game, [FromForm] IFormFile image)
         {
             if (image != null)
             {
                 game.Image = image;
             }
+            else
+            {
+                return BadRequest("Brak zdjęcia");
+            }
 
             var result = await _gamesService.AddGame(game);
             if (!result)
             {
-                return BadRequest();
+                return BadRequest("Jest null");
             }
 
             return Ok("Game Successfully added");
@@ -76,7 +81,8 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPut("{gameId}")]
-        public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId, [FromBody] GameAddUpdateDto game, [FromForm] IFormFile image)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId, [FromForm] GameAddUpdateDto game, [FromForm] IFormFile image)
         {
             if (image != null)
             {
