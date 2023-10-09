@@ -81,7 +81,7 @@ namespace GameCenter.Controllers
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPost]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> AddPost([FromForm] PostAddUpdateDto post, [FromForm] IFormFile image)
+        public async Task<IActionResult> AddPost([FromForm] PostAddUpdateDto post, [FromForm] IFormFile? image)
         {
             if (image != null)
             {
