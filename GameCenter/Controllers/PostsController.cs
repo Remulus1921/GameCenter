@@ -60,7 +60,8 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPut("{postId}")]
-        public async Task<IActionResult> UpdatePost([FromRoute] Guid postId, [FromBody] PostAddUpdateDto post, [FromForm] IFormFile image)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UpdatePost([FromRoute] Guid postId, [FromForm] PostAddUpdateDto post, [FromForm] IFormFile image)
         {
             if (image != null)
             {
@@ -79,7 +80,8 @@ namespace GameCenter.Controllers
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPost]
-        public async Task<IActionResult> AddPost([FromBody] PostAddUpdateDto post, [FromForm] IFormFile image)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> AddPost([FromForm] PostAddUpdateDto post, [FromForm] IFormFile image)
         {
             if (image != null)
             {
