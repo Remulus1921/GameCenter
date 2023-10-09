@@ -60,6 +60,8 @@ namespace GameCenter.Core.Services.GameService
                 return false;
             }
 
+            this.DeleteFile(game.ImageName);
+
             await _unitOfWork.Games.Delete(game);
             await _unitOfWork.CompleteAsync();
 
