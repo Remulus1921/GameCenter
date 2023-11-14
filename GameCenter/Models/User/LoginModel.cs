@@ -5,11 +5,11 @@ namespace GameCenter.Models.User
 
     public class LoginModel
     {
-        [Required(ErrorMessage = "Email is required")]
+        [Required(ErrorMessage = "Email jest wymagany")]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required(ErrorMessage = "Hasło jest wymagane")]
         public string Password { get; set; }
     }
 }

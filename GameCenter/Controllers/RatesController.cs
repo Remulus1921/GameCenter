@@ -20,6 +20,7 @@ namespace GameCenter.Controllers
             _ratesService = ratesService;
         }
 
+        [AllowAnonymous]
         [HttpGet("gameRate/{gameId}")]
         public async Task<IActionResult> GetAvarageRate([FromRoute] Guid gameId)
         {

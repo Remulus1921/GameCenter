@@ -1,6 +1,8 @@
 ﻿using GameCenter.Data;
+using GameCenter.Dtos.UserDtos;
 using GameCenter.Models.User;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -36,11 +38,11 @@ namespace GameCenter.Core.Services.AuthService
             var usernameTaken = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
             {
-                return (0, "User with given email already exists");
+                return (0, "Email zajęty");
             }
             if (usernameTaken != null)
             {
-                return (0, "User with given Username already exists");
+                return (0, "Nazwa użytkownika zajęta");
             }
 
             GameCenterUser user = new()
@@ -55,7 +57,7 @@ namespace GameCenter.Core.Services.AuthService
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
-                return (0, "User creation failed! Please check user details and try again.");
+                return (0, "Nie udało się stworzyć konta! Proszę sprawdź jeszcze raz dane i spróbuj ponownie.");
             }
 
             if (!await _roleManager.RoleExistsAsync(role))
@@ -63,7 +65,7 @@ namespace GameCenter.Core.Services.AuthService
             if (await _roleManager.RoleExistsAsync(role))
                 await _userManager.AddToRoleAsync(user, role);
 
-            return (1, "User created successfully");
+            return (1, "Użytkownik stworzony pomyślnie");
 
         }
 
@@ -71,9 +73,9 @@ namespace GameCenter.Core.Services.AuthService
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return (0, "Email or Password was invalid", null);
+                return (0, "Nie prawidłowy login lub hasło", null);
             if (!await _userManager.CheckPasswordAsync(user, model.Password))
-                return (0, "Email or Password was invalid", null);
+                return (0, "Nie prawidłowy login lub hasło", null);
 
             string token = await GenerateToken(user);
 
@@ -86,13 +88,13 @@ namespace GameCenter.Core.Services.AuthService
             return (1, token, refreshToken);
         }
 
-        public async Task<(int, string, RefreshToken?)> RefreshToken(string userName, string token)
+        public async Task<(int, string, RefreshToken?)> RefreshToken(string email, string token)
         {
-            var user = await _userManager.FindByNameAsync(userName);
-            if (user == null) return (0, "Invalid Username", null);
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return (0, "Zaloguj się jeszcze raz", null);
 
             var refreshToken = _context.RefreshTokens.FirstOrDefault(r => r.Token == token && r.UserId == user.Id);
-            if (refreshToken == null) return (0, "There is no such token", null);
+            if (refreshToken == null) return (0, "Zaloguj się jeszcze raz", null);
             else if (refreshToken.IsValid == false)
             {
                 var childToken = _context.RefreshTokens.FirstOrDefault(r => r.ParentId == refreshToken.Id);
@@ -101,10 +103,10 @@ namespace GameCenter.Core.Services.AuthService
                     childToken.IsValid = false;
                     childToken = _context.RefreshTokens.FirstOrDefault(r => r.ParentId == childToken.Id);
                 }
-                return (0, "Refresh token got compromised relog", null);
+                return (0, "Zaloguj się jeszcze raz", null);
             }
 
-            if (refreshToken.Expires < DateTime.Now) return (0, "Token expired", null);
+            if (refreshToken.Expires < DateTime.Now) return (0, "Zaloguj się jeszcze raz", null);
 
             string newToken = await GenerateToken(user);
             var newRefreshToken = GenerateRefreshToken();
@@ -150,7 +152,7 @@ namespace GameCenter.Core.Services.AuthService
             {
                 Issuer = _configuration.GetSection("Jwt:Issuer").Value,
                 Audience = _configuration.GetSection("Jwt:Audience").Value,
-                Expires = DateTime.Now.AddHours(1),
+                Expires = DateTime.Now.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(authClaims)
             };
@@ -161,6 +163,93 @@ namespace GameCenter.Core.Services.AuthService
             return tokenHandler.WriteToken(token);
         }
 
+        public async Task<List<UserDto>?> GetUsersList()
+        {
+            var users = await _context.Users.Select(u => new
+            {
+                User = u,
+                Roles = _context.UserRoles
+                    .Where(ur => ur.UserId == u.Id)
+                    .Join(_context.Roles, ur => ur.RoleId, role => role.Id, (ur, role) => role.Name)
+                    .ToList()
+            })
+            .ToListAsync();
 
+            if (users.Count == 0)
+            {
+                return null;
+            }
+
+            var usersList = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                var userDto = new UserDto
+                {
+                    UserName = user.User.UserName,
+                    UserEmail = user.User.Email,
+                    UserRole = user.Roles.First()
+                };
+
+                usersList.Add(userDto);
+            }
+
+            return usersList;
+        }
+
+        public async Task<bool?> UpdateUserRole(string roleName, string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var currRoles = await _userManager.GetRolesAsync(user);
+            foreach (var role in currRoles)
+            {
+                await _userManager.RemoveFromRoleAsync(user, role);
+            }
+
+            if (await _roleManager.RoleExistsAsync(roleName))
+            {
+                await _userManager.AddToRoleAsync(user, roleName);
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool?> DeleteUserByEmail(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+                return null;
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+                return true;
+            else return false;
+        }
+
+        public async Task<UserDto?> GetUserDetails(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+                return null;
+
+            var role = _context.UserRoles.Where(ur => ur.UserId == user.Id).Join(_context.Roles, ur => ur.RoleId, role => role.Id, (ur, role) => role.Name).ToList();
+
+            var userDto = new UserDto
+            {
+                UserEmail = user.Email,
+                UserName = user.UserName,
+                UserRole = role.First()
+            };
+
+            return userDto;
+        }
     }
 }

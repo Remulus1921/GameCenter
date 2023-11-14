@@ -48,7 +48,6 @@ namespace GameCenter.Core.Services.PostsService
             {
                 Title = post.Title,
                 Content = post.Content,
-                Modified = DateTime.Now,
                 ImageName = post.Image != null ? uniqueName : null,
                 User = user,
                 Platforms = platforms
@@ -187,7 +186,14 @@ namespace GameCenter.Core.Services.PostsService
         {
             string uniqueName = Guid.NewGuid().ToString();
 
-            string path = Path.Combine(_uploadsFolder, uniqueName + Path.GetExtension(file.FileName));
+            string fileExtention = Path.GetExtension(file.FileName);
+
+            if (fileExtention == String.Empty)
+            {
+                fileExtention = ".jpg";
+            }
+
+            string path = Path.Combine(_uploadsFolder, uniqueName + fileExtention);
 
             using (var stream = new FileStream(path, FileMode.Create))
             {

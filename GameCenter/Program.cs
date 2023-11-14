@@ -88,10 +88,23 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options => options.AddPolicy("FrontEnd", policy =>
 {
-    policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+    policy.WithOrigins("https://localhost:4200").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var servPro = services.GetService<UserManager<GameCenterUser>>();
+
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
+
+    var adminPass = builder.Configuration.GetValue<string>("AdminPass");
+    await SeedData.CreateRole(services);
+    await SeedData.Initialize(services, servPro!, adminPass!);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

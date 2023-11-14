@@ -36,13 +36,7 @@ namespace GameCenter.Data
                 .HasOne(c => c.Parent)
                 .WithMany(c => c.Replies)
                 .HasForeignKey(c => c.ParentId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<Comment>()
-                .HasOne(c => c.Parent)
-                .WithMany()
-                .HasForeignKey(c => c.ParentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Comment>()
                 .HasOne(c => c.Game)

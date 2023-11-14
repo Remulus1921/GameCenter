@@ -4,20 +4,20 @@ namespace GameCenter.Models.User
 {
     public class RegisterModel
     {
-        [Required(ErrorMessage = "First name is required")]
+        [Required(ErrorMessage = "Imie jest wymagane")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Last name is required")]
+        [Required(ErrorMessage = "Nazwisko jest wymagane")]
         public string LastName { get; set; }
 
-        [EmailAddress]
-        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Wymagany jest prawidłowy format adresu email")]
+        [Required(ErrorMessage = "Email jest wymagany")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Username is required")]
+        [Required(ErrorMessage = "Nazwa użytkownika jest wymagana")]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required(ErrorMessage = "Hasło jest wymagane")]
         public string Password { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace GameCenter.Controllers
             _gamesService = gamesService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetGames()
         {
@@ -31,6 +32,7 @@ namespace GameCenter.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{gameId}")]
         public async Task<IActionResult> GetGameById([FromRoute] Guid gameId)
         {
@@ -73,10 +75,10 @@ namespace GameCenter.Controllers
             var result = await _gamesService.AddGame(game);
             if (!result)
             {
-                return BadRequest("Jest null");
+                return BadRequest("Wystąpił błąd podczas dodawania gry");
             }
 
-            return Ok("Game Successfully added");
+            return Ok("Dodano nową grę");
         }
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]

@@ -19,6 +19,7 @@ namespace GameCenter.Controllers
             _postsService = postsService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
@@ -32,6 +33,7 @@ namespace GameCenter.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
         {
@@ -75,7 +77,7 @@ namespace GameCenter.Controllers
                 return BadRequest();
             }
 
-            return Ok("Post Updated Successfully");
+            return Ok("Zaktualizowano artykuł");
         }
 
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
@@ -91,7 +93,7 @@ namespace GameCenter.Controllers
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
             {
-                return NotFound("No email claim in authorization");
+                return NotFound("Błąd autoryzacji");
             }
             string email = emailClaim.Value;
 
@@ -99,10 +101,10 @@ namespace GameCenter.Controllers
 
             if (!result)
             {
-                return NotFound("No User with provided email");
+                return NotFound("Błąd autoryzacji");
             }
 
-            return Ok("Post Successfully added");
+            return Ok("Dodano nowy arytuł");
         }
     }
 }

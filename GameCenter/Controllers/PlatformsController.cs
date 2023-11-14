@@ -51,7 +51,7 @@ namespace GameCenter.Controllers
 
             if (!result)
             {
-                return BadRequest("Platform with given name already exists");
+                return BadRequest("Taka platforma już istnieje");
             }
 
             return Ok();
@@ -63,7 +63,7 @@ namespace GameCenter.Controllers
             var result = await _platformService.DeletePlatform(platformDto);
             if (!result)
             {
-                return BadRequest("There is no platform with provided name");
+                return BadRequest("Błąd podczas usuwania platformy");
             }
 
             return NoContent();
@@ -75,7 +75,7 @@ namespace GameCenter.Controllers
             var result = await _platformService.UpdatePlatform(platformDto);
             if (!result)
             {
-                return BadRequest("No platform");
+                return BadRequest("Nie ma takiej platformy");
             }
 
             return Ok();

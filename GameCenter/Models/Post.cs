@@ -11,7 +11,7 @@ namespace GameCenter.Models
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
-        public DateTime Modified { get; set; }
+        public DateTime Modified { get; set; } = DateTime.Now;
         public string? ImageName { get; set; }
         public IdentityUser User { get; set; }
         public string UserId { get; set; }

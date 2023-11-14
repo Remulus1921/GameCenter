@@ -16,5 +16,10 @@ namespace GameCenter.Core.Repositories.CommentsRepository
         {
             return _context.Comments.Include(c => c.User).Where(c => c.GameId == gameId).ToList();
         }
+
+        public async override Task<Comment?> GetById(Guid id)
+        {
+            return _context.Comments.Include(c => c.Replies).SingleOrDefault(c => c.Id == id);
+        }
     }
 }

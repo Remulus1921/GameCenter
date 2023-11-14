@@ -70,11 +70,11 @@ namespace GameCenter.Tests.Controller
             //Arrange
             string newName = "";
             var platform = A.Fake<PlatformDto>();
-            A.CallTo(() => _platformsService.UpdatePlatform(platform, newName)).Returns(true);
+            A.CallTo(() => _platformsService.UpdatePlatform(platform)).Returns(true);
             var controller = new PlatformsController(_platformsService);
 
             //Act
-            var result = await controller.UpdatePlatform(platform, newName);
+            var result = await controller.UpdatePlatform(platform);
 
             result.Should().NotBeNull();
             result.Should().BeOfType<OkResult>();

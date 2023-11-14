@@ -3,7 +3,7 @@ using FluentAssertions;
 using GameCenter.Core.Services.CommentsService;
 using GameCenter.Data;
 using GameCenter.Data.UnitOfWork;
-using GameCenter.Dtos.CommentDto;
+using GameCenter.Dtos.CommentDtos;
 using GameCenter.Models;
 using Microsoft.AspNetCore.Identity;
 

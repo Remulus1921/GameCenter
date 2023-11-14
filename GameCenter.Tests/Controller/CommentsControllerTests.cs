@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GameCenter.Controllers;
 using GameCenter.Core.Services.CommentsService;
-using GameCenter.Dtos.CommentDto;
+using GameCenter.Dtos.CommentDtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameCenter.Tests.Controller

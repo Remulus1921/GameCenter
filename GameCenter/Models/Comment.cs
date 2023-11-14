@@ -10,7 +10,7 @@ namespace GameCenter.Models
         public Guid Id { get; set; }
         public string CommentContent { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
-        public DateTime ModificationDate { get; set; }
+        public DateTime ModificationDate { get; set; } = DateTime.Now;
         public Game Game { get; set; }
         public Guid GameId { get; set; }
         public IdentityUser User { get; set; }

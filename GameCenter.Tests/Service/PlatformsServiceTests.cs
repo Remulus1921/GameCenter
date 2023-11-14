@@ -94,7 +94,7 @@ namespace GameCenter.Tests.Service
             var service = new PlatformsService(_unitOfWork);
 
             //Act
-            var result = await service.UpdatePlatform(platformDto, newName);
+            var result = await service.UpdatePlatform(platformDto);
 
             //Assert
             result.Should().BeTrue();

@@ -37,7 +37,6 @@ namespace GameCenter.Core.Services.CommentsService
             var newComment = new Comment
             {
                 CommentContent = comment.CommentContent,
-                ModificationDate = DateTime.Now,
                 Game = game,
                 User = user,
                 Parent = parent,
@@ -57,6 +56,7 @@ namespace GameCenter.Core.Services.CommentsService
                 return false;
             }
 
+            if (commentExists.Replies != null) DeleteReplies(commentExists.Replies);
             await _unitOfWork.Comments.Delete(commentExists);
             await _unitOfWork.CompleteAsync();
 
@@ -107,6 +107,19 @@ namespace GameCenter.Core.Services.CommentsService
             await _unitOfWork.CompleteAsync();
 
             return true;
+        }
+
+        private async void DeleteReplies(ICollection<Comment> replies)
+        {
+            foreach (var reply in replies.ToList())
+            {
+                if (reply.Replies != null)
+                {
+                    DeleteReplies(reply.Replies);
+                }
+
+                await _unitOfWork.Comments.Delete(reply);
+            }
         }
     }
 }

@@ -183,7 +183,12 @@ namespace GameCenter.Core.Services.GameService
         {
             string uniqueName = Guid.NewGuid().ToString();
 
-            string path = Path.Combine(_uploadsFolder, uniqueName + Path.GetExtension(file.FileName));
+            string fileExtention = Path.GetExtension(file.FileName);
+
+            if (fileExtention == string.Empty)
+                fileExtention = ".jpg";
+
+            string path = Path.Combine(_uploadsFolder, uniqueName + fileExtention);
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
