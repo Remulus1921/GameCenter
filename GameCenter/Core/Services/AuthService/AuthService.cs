@@ -234,7 +234,7 @@ namespace GameCenter.Core.Services.AuthService
             else return false;
         }
 
-        public async Task<UserDto?> GetUserDetails(string userEmail)
+        public async Task<UserUpdateDto?> GetUserDetails(string userEmail)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
@@ -242,14 +242,53 @@ namespace GameCenter.Core.Services.AuthService
 
             var role = _context.UserRoles.Where(ur => ur.UserId == user.Id).Join(_context.Roles, ur => ur.RoleId, role => role.Id, (ur, role) => role.Name).ToList();
 
-            var userDto = new UserDto
+            var userDto = new UserUpdateDto
             {
                 UserEmail = user.Email,
                 UserName = user.UserName,
-                UserRole = role.First()
+                FirstName = user.FirstName,
+                LastName = user.LastName,
             };
 
             return userDto;
+        }
+
+        public async Task<bool?> UpdateUserDetails(UserUpdateDto userDto)
+        {
+            var user = await _userManager.FindByEmailAsync(userDto.UserEmail);
+            if (user == null) return null;
+
+            if (user.UserName != userDto.UserName)
+            {
+                var userNameTaken = await _userManager.FindByNameAsync(userDto.UserName);
+                if (userNameTaken != null) return false;
+            }
+
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+            user.UserName = userDto.UserName;
+
+            if (!userDto.Password.IsNullOrEmpty())
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, userDto.Password);
+
+                if (!result.Succeeded)
+                {
+                    return null;
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (updateResult.Succeeded)
+            {
+                return true;
+            }
+            else
+            {
+                return null;
+            }
+
         }
     }
 }

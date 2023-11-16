@@ -125,6 +125,23 @@ namespace GameCenter.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPut("update-user")]
+        public async Task<IActionResult> UpdateUserDetails([FromBody] UserUpdateDto user)
+        {
+            if (user == null)
+                return BadRequest("Błąd serwera");
+
+            var result = await _authService.UpdateUserDetails(user);
+            if (result == false)
+                return BadRequest("Nazwa Użytkownika zajęta");
+            else if (result == null)
+                return BadRequest("Błąd poczas przetwarzania danych");
+
+            return Ok();
+
+        }
+
         [Authorize(Roles = UserRoles.Admin + "," + UserRoles.Moderator)]
         [HttpPut("grant-the-role")]
         public async Task<IActionResult> UpdateUserRole([FromBody] RoleDto roleDto)

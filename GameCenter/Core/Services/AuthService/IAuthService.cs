@@ -12,6 +12,7 @@ namespace GameCenter.Core.Services.AuthService
         Task<List<UserDto>?> GetUsersList();
         Task<bool?> UpdateUserRole(string roleName, string userEmail);
         Task<bool?> DeleteUserByEmail(string userEmail);
-        Task<UserDto?> GetUserDetails(string userEmail);
+        Task<UserUpdateDto?> GetUserDetails(string userEmail);
+        Task<bool?> UpdateUserDetails(UserUpdateDto userDto);
     }
 }
