@@ -64,7 +64,7 @@ namespace GameCenter.Controllers
                 if (status == 0)
                     return BadRequest(message);
 
-                return CreatedAtAction(nameof(Register), registerModel);
+                return Ok();
             }
             catch (Exception ex)
             {
