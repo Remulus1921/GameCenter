@@ -122,6 +122,7 @@ namespace GameCenter.Core.Services.GameService
                     GameType = game.GameType,
                     Rating = game.Rating,
                     Image = file,
+                    Platforms = game.Platforms.Select(p => p.PlatformName).ToList()
                 });
             }
 

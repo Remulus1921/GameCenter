@@ -10,5 +10,6 @@ namespace GameCenter.Dtos.GameDto
         public string GameType { get; set; }
         public string Rating { get; set; }
         public FileDto Image { get; set; }
+        public List<string> Platforms { get; set; }
     }
 }

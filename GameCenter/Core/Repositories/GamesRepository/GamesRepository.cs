@@ -21,5 +21,10 @@ namespace GameCenter.Core.Repositories.GameRepository
                 .ThenInclude(c => (c as Comment).User)
                 .FirstOrDefaultAsync(g => g.Id == id);
         }
+
+        public override async Task<IEnumerable<Game>> All()
+        {
+            return await _context.Games.Include(g => g.Platforms).ToListAsync();
+        }
     }
 }
